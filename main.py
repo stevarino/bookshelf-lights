@@ -2,10 +2,28 @@ import board
 import neopixel
 from time import sleep
 import digitalio
+import logging
+import logging.handlers
 
 from gpiozero import Button
 
 pixels = neopixel.NeoPixel(board.D18, 1)
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+log_format = logging.Formatter(
+  '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+log_stream = logging.StreamHandler()
+log_stream.setFormatter(log_format)
+logging.getLogger().addHandler(log_stream)
+
+log_file = logging.handlers.TimedRotatingFileHandler(
+  '/home/pi/logs/bookshelf-lights.log', when='d', backupCount=30)
+log_file.setFormatter(log_format)
+logging.getLogger().addHandler(log_file)
+
+
 
 
 i = 0
@@ -22,6 +40,7 @@ def button_1_pressed():
 button = Button(27)
 button.when_pressed = button_1_pressed
 
+logger.info("Starting up...")
 try:
   while True:
     pixels[0] = (i, 0, 0)
@@ -35,10 +54,10 @@ try:
       i = lo - j
       j  *= -1
     pixels.show()
+    ValueError("foo")
     sleep(delay)
-    raise ValueError("foo")
 except BaseException as e:
-  print(e)
+  logger.error("Error: %s", e.__class__.__name__, exc_info=True)
 
 pixels[0] = (0, 0, 0)
 pixels.show()
