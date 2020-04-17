@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 log_format = logging.Formatter(
-  '{asctime} {levelname:7} {name} - {message}',
+  '%(asctime)s %(levelname)7s %(name)s - %(message)s',
   datefmt='%Y%m%d %H%M%S')
 log_stream = logging.StreamHandler()
 log_stream.setFormatter(log_format)
