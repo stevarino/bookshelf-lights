@@ -54,7 +54,6 @@ try:
       i = lo - j
       j  *= -1
     pixels.show()
-    ValueError("foo")
     sleep(delay)
 except BaseException as e:
   logger.error("Error: %s", e.__class__.__name__, exc_info=True)
