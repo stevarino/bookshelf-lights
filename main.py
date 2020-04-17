@@ -36,8 +36,9 @@ try:
       j  *= -1
     pixels.show()
     sleep(delay)
-except:
-  print("exiting")
+    raise ValueError("foo")
+except BaseException as e:
+  print(e)
 
 pixels[0] = (0, 0, 0)
 pixels.show()

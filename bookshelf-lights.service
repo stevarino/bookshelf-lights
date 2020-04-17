@@ -4,7 +4,7 @@ After=multi-user.target
 
 [Service]
 Type=idle
-ExecStart=/usr/bin/python /home/pi/sample.py
+ExecStart=/home/pi/bookshelf-lights/bookshelf-lights.sh
 
 [Install]
 WantedBy=multi-user.target
