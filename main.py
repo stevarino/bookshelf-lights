@@ -37,7 +37,7 @@ try:
     pixels.show()
     sleep(delay)
 except:
-  pass
+  print("exiting")
 
 pixels[0] = (0, 0, 0)
 pixels.show()
