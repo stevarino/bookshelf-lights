@@ -111,7 +111,7 @@ class Display(object):
         self._on_release[btn] = action
 
     def clear(self):
-        for i in range(len(strand)):
+        for i in range(len(self.strand)):
             self.strand[i] = (0, 0, 0)
         self.strand.show()
 
