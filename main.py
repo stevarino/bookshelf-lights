@@ -49,6 +49,7 @@ class Display(object):
         self.strand = strand
         self.states = []
         self.delay = delay
+        self._button_handles = {}
         self._button_values = {}
         self._on_press = {}
         self._on_release = {}
@@ -79,15 +80,16 @@ class Display(object):
             self.sleep()
 
     def read(self):
-        for button, value in self._button_values.items():
+        for btn, value in self._button_values.items():
+            button = self._button_handles[btn]
             if not value and button.value:
-                self._button_values[button] = True
-                if button in self._on_press:
-                    self._on_press[button]()
+                self._button_values[btn] = True
+                if btn in self._on_press:
+                    self._on_press[btn]()
             elif value and not button.value:
-                self._button_values[button] = False
-                if button.pin in self._on_release:
-                    self._on_release[button.pin]()
+                self._button_values[btn] = False
+                if btn in self._on_release:
+                    self._on_release[btn]()
 
     def sleep(self):
         sleep(self.delay)
@@ -98,12 +100,16 @@ class Display(object):
 
             
     def register_onpress(self, pin, action):
-        self._button_values[pin] = False
-        self._on_press[pin] = action
+        btn = str(pin)
+        self._button_handles[btn] = pin
+        self._button_values[btn] = False
+        self._on_press[btn] = action
 
     def register_onrelease(self, pin, action):
-        self._button_values[pin] = False
-        self._on_release[pin] = action
+        btn = str(pin)
+        self._button_handles[btn] = pin
+        self._button_values[btn] = False
+        self._on_release[btn] = action
 
 
 def setup_logger():
