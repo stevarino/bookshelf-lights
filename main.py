@@ -44,7 +44,7 @@ class Fade(State):
 
 class Display(object):
     """Contains the state of the entire LED display."""
-    def __init__(self, strand, length, delay):
+    def __init__(self, strand, delay):
         self.strand = strand
         self.states = []
         self.delay = delay
@@ -110,6 +110,11 @@ class Display(object):
         self._button_values[btn] = False
         self._on_release[btn] = action
 
+    def clear(self):
+        for i in range(len(strand)):
+            self.strand[i] = (0, 0, 0)
+        self.strand.show()
+
 
 def setup_logger():
     logger.setLevel(logging.DEBUG)
@@ -144,13 +149,14 @@ def main():
         btn.__str__ = pin.__str__
         return btn
  
-    display = Display(neopixel.NeoPixel(board.D18, LENGTH), LENGTH, DELAY)
+    display = Display(neopixel.NeoPixel(board.D18, LENGTH), DELAY)
     display.register_state(Fade, length=1)
     display.register_onpress(init_pin(board.D27), lambda: button_pressed(1))
     display.register_onpress(init_pin(board.D22), lambda: button_pressed(2))
     try:
         display.loop()
     except BaseException as e:
+        display.clear()
         logger.error("Error: %s", e.__class__.__name__, exc_info=True)
 
 if __name__ == '__main__':

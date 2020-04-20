@@ -34,7 +34,7 @@ class CallbackCounter(object):
 
 
 def get_display(length):
-    display = main.Display(FakeStrand(1), 1, 1)
+    display = main.Display(FakeStrand(1), 1)
     display.sleep = lambda: 'noop'
     return display
 
