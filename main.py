@@ -3,7 +3,6 @@ import logging.handlers
 import os
 import time
 
-
 logger = logging.getLogger(__name__)
 logger.info("Starting up...")
 
@@ -130,6 +129,7 @@ def setup_logger():
 
 def main():
     import board
+    import digitalio
     import neopixel
 
     setup_logger()
@@ -137,16 +137,17 @@ def main():
     DELAY = 0.01
     def button_pressed(button_num):
         logging.info("button %s pressed", button_num)
-    
-    btn1 = board.D27
-    btn1.init(pull=board.D27.PULL_DOWN)
-    btn2 = board.D22
-    btn2.init(pull=board.D22.PULL_DOWN)
+
+    def init_pin(pin):
+        btn = digitalio.DigitalInOut(pin)
+        btn.pull = digitalio.Pull.DOWN
+        btn.__str__ = pin.__str__
+        return btn
  
     display = Display(neopixel.NeoPixel(board.D18, LENGTH), LENGTH, DELAY)
     display.register_state(Fade, length=1)
-    display.register_onpress(btn1, lambda: button_pressed(1))
-    display.register_onpress(btn2, lambda: button_pressed(2))
+    display.register_onpress(init_pin(board.D27), lambda: button_pressed(1))
+    display.register_onpress(init_pin(board.D22), lambda: button_pressed(2))
     try:
         display.loop()
     except BaseException as e:
