@@ -143,12 +143,12 @@ def main():
     def button_pressed(button_num):
         logging.info("button %s pressed", button_num)
 
-    def init_pin(pin):
-        btn = digitalio.DigitalInOut(pin)
-        btn.direction = digitalio.Direction.INPUT
-        btn.pull = digitalio.Pull.DOWN
-        btn.__str__ = pin.__str__
-        return btn
+    # def init_pin(pin):
+    #     btn = digitalio.DigitalInOut(pin)
+    #     btn.direction = digitalio.Direction.INPUT
+    #     btn.pull = digitalio.Pull.DOWN
+    #     btn.__str__ = pin.__str__
+    #     return btn
 
     btn1 = gpiozero.Button(27)
     btn1.when_pressed = lambda: button_pressed(1)
@@ -156,7 +156,7 @@ def main():
     display = Display(neopixel.NeoPixel(board.D18, LENGTH), DELAY)
     display.register_state(Fade, length=1)
     # display.register_onpress(init_pin(board.D27), lambda: button_pressed(1))
-    display.register_onpress(init_pin(board.D22), lambda: button_pressed(2))
+    # display.register_onpress(init_pin(board.D22), lambda: button_pressed(2))
     try:
         display.loop()
     except BaseException as e:
