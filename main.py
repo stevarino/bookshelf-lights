@@ -134,7 +134,7 @@ def setup_logger():
 
 def main():
     import board
-    import digitalio
+    import gpiozero
     import neopixel
 
     setup_logger()
@@ -149,10 +149,13 @@ def main():
         btn.pull = digitalio.Pull.DOWN
         btn.__str__ = pin.__str__
         return btn
+
+    btn1 = gpiozero.Button(27)
+    btn1.when_pressed = lambda: button_pressed(1)
  
     display = Display(neopixel.NeoPixel(board.D18, LENGTH), DELAY)
     display.register_state(Fade, length=1)
-    display.register_onpress(init_pin(board.D27), lambda: button_pressed(1))
+    # display.register_onpress(init_pin(board.D27), lambda: button_pressed(1))
     display.register_onpress(init_pin(board.D22), lambda: button_pressed(2))
     try:
         display.loop()
