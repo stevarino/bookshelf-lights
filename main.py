@@ -139,13 +139,14 @@ def main():
         logging.info("button %s pressed", button_num)
     
     btn1 = board.D27
-    btn1.init(pull=btn1.PULL_DOWN)
-    btn2.init(pull=btn2.PULL_DOWN)
+    btn1.init(pull=board.D27.PULL_DOWN)
+    btn2 = board.D22
+    btn2.init(pull=board.D22.PULL_DOWN)
  
     display = Display(neopixel.NeoPixel(board.D18, LENGTH), LENGTH, DELAY)
     display.register_state(Fade, length=1)
-    display.register_onpress(board.D27, lambda: button_pressed(1))
-    display.register_onpress(board.D22, lambda: button_pressed(2))
+    display.register_onpress(btn1, lambda: button_pressed(1))
+    display.register_onpress(btn2, lambda: button_pressed(2))
     try:
         display.loop()
     except BaseException as e:
