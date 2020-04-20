@@ -92,7 +92,7 @@ class Display(object):
                     self._on_release[btn]()
 
     def sleep(self):
-        sleep(self.delay)
+        time.sleep(self.delay)
 
     def tick(self):
         for state in self.states:
