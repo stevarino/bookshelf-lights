@@ -137,6 +137,10 @@ def main():
     DELAY = 0.01
     def button_pressed(button_num):
         logging.info("button %s pressed", button_num)
+    
+    btn1 = board.D27
+    btn1.init(pull=btn1.PULL_DOWN)
+    btn2.init(pull=btn2.PULL_DOWN)
  
     display = Display(neopixel.NeoPixel(board.D18, LENGTH), LENGTH, DELAY)
     display.register_state(Fade, length=1)
