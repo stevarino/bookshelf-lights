@@ -134,7 +134,6 @@ def main():
  
     display = Display(neopixel.NeoPixel(board.D18, LENGTH), LENGTH, DELAY)
     display.register_state(Fade, length=1)
-    display.register_state(Fade, length=1)
     display.register_onpress(board.D27, lambda: button_pressed(1))
     display.register_onpress(board.D22, lambda: button_pressed(2))
     try:
