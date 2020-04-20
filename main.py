@@ -145,6 +145,7 @@ def main():
 
     def init_pin(pin):
         btn = digitalio.DigitalInOut(pin)
+        btn.direction = digitalio.Direction.INPUT
         btn.pull = digitalio.Pull.DOWN
         btn.__str__ = pin.__str__
         return btn
