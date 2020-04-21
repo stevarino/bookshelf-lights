@@ -161,7 +161,7 @@ def main():
     #     btn.__str__ = pin.__str__
     #     return btn
 
-    btn1 = gpiozero.Button(27)
+    # btn1 = gpiozero.Button(27)
     # btn1.when_pressed = lambda: button_pressed(1)
  
     display = Display(neopixel.NeoPixel(board.D18, LENGTH), DELAY)
