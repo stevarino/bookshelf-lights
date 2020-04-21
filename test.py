@@ -22,6 +22,10 @@ class FakeButton(object):
     def __init__(self, value=False):
         self.value = value
 
+    @property
+    def is_pressed(self):
+        return self.value
+
 class CallbackCounter(object):
     def __init__(self):
         self.value = 0
