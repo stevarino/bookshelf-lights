@@ -1,10 +1,13 @@
 import logging
 import logging.handlers
 import os
+import subprocess
 import time
 
+LENGTH = 2
+DELAY = 0.05
+
 logger = logging.getLogger(__name__)
-logger.info("Starting up...")
 
 class State(object):
     """Abstract. Contains the state of a set of LEDs."""
@@ -26,7 +29,7 @@ class Fade(State):
     def setup(self):
         self.value = 0
         self.step = 1
-        self.high = 255
+        self.high = 15
         self.low = 0
 
     def tick(self):
@@ -52,8 +55,12 @@ class Display(object):
         self._button_values = {}
         self._on_press = {}
         self._on_release = {}
+
+        # repert every 5 minutes = 300s/report = 6000 ticks @ 0.05s/tick
+        self.loop_limit = 300 / delay 
         self.loop_cnt = 0
-        self.loop_times = [0] * 100
+        self.loop_total = 0
+        self.loop_max = 0
 
     def register_state(self, state_cls, length=0, index=-1):
         if index != -1:
@@ -84,25 +91,32 @@ class Display(object):
     def read(self):
         for btn, value in self._button_values.items():
             button = self._button_handles[btn]
-            if not value and button.is_pressed:
+            if not value and button.value:
+                logger.info("button %s pressed", btn)
                 self._button_values[btn] = True
                 if btn in self._on_press:
                     self._on_press[btn]()
-            elif value and not button.is_pressed:
+            elif value and not button.value:
+                logger.info("button %s released", btn)
                 self._button_values[btn] = False
                 if btn in self._on_release:
                     self._on_release[btn]()
 
     def sleep(self, secs=0):
-        self.loop_times[self.loop_cnt] = secs
+        self.loop_total += secs
         self.loop_cnt += 1
-        if self.loop_cnt == len(self.loop_timmes):
+        if secs > self.loop_max:
+            self.loop_max = secs
+        if self.loop_cnt == self.loop_limit:
+            logger.info("Time states: avg={:0.4f}s, max={:0.4f}s".format(
+                self.loop_total / self.loop_limit,
+                self.loop_max
+            ))
             self.loop_cnt = 0
-            logger.info("Time states: avg={:0.3f}, max={:0.3f}").format(
-                sum(self.loop_times) / len(self.loop_times),
-                max(self.loop_times)
-            )
-        time.sleep(self.delay)
+            self.loop_max = 0
+            self.loop_total = 0
+        if self.delay > secs:
+            time.sleep(self.delay - secs)
 
     def tick(self):
         for state in self.states:
@@ -111,12 +125,14 @@ class Display(object):
             
     def register_onpress(self, pin, action):
         btn = str(pin)
+        logger.info("Registered onpress for %s", btn)
         self._button_handles[btn] = pin
         self._button_values[btn] = False
         self._on_press[btn] = action
 
     def register_onrelease(self, pin, action):
         btn = str(pin)
+        logger.info("Registered onrelease for %s", btn)
         self._button_handles[btn] = pin
         self._button_values[btn] = False
         self._on_release[btn] = action
@@ -131,7 +147,7 @@ def setup_logger():
     logger.setLevel(logging.DEBUG)
 
     log_format = logging.Formatter(
-    '%(asctime)s %(levelname)7s %(name)s - %(message)s',
+        '%(asctime)s %(levelname)7s %(name)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S')
     log_stream = logging.StreamHandler()
     log_stream.setFormatter(log_format)
@@ -149,25 +165,23 @@ def main():
     import neopixel
 
     setup_logger()
-    LENGTH = 1
-    DELAY = 0.05
-    def button_pressed(button_num):
-        logging.info("button %s pressed", button_num)
-
-    # def init_pin(pin):
-    #     btn = digitalio.DigitalInOut(pin)
-    #     btn.direction = digitalio.Direction.INPUT
-    #     btn.pull = digitalio.Pull.DOWN
-    #     btn.__str__ = pin.__str__
-    #     return btn
-
-    # btn1 = gpiozero.Button(27)
-    # btn1.when_pressed = lambda: button_pressed(1)
+    logger.info("Starting up... Strand length = %s, delay = %0.3f",
+                LENGTH, DELAY)
  
     display = Display(neopixel.NeoPixel(board.D18, LENGTH), DELAY)
+
+    def button_pressed(button_num):
+        logger.info("button %s pressed", button_num)
+
+    def shutdown():
+        display.clear()
+        subprocess.call('halt', shell=False)
+ 
     display.register_state(Fade, length=1)
-    display.register_onpress(gpiozero.Button(27), lambda: button_pressed(1))
-    # display.register_onpress(init_pin(board.D22), lambda: button_pressed(2))
+    display.register_onpress(
+        gpiozero.Button(4), shutdown)
+    display.register_onpress(
+        gpiozero.Button(17), lambda: button_pressed(2))
     try:
         display.loop()
     except BaseException as e:

@@ -22,10 +22,6 @@ class FakeButton(object):
     def __init__(self, value=False):
         self.value = value
 
-    @property
-    def is_pressed(self):
-        return self.value
-
 class CallbackCounter(object):
     def __init__(self):
         self.value = 0
@@ -73,7 +69,7 @@ class TestDisplay(unittest.TestCase):
         button.value = True
         display.read()
         assert callback == 1
-        for i in range(5):
+        for i in range(200):
             display.read()
         assert callback == 1
         
